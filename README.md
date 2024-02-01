@@ -45,7 +45,7 @@ cd Flutter-intern-pratice
 cd flutter pub get
 ```
 
-5. Set up your Firebase project and download the google-services.json file (for Android) or GoogleService-Info.plist (for iOS).
+5. Set up your Firebase project.
 
 6. Run the application:
 
