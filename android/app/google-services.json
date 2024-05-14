@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1029381441351",
+    "project_id": "intern-flutter-ae32d",
+    "storage_bucket": "intern-flutter-ae32d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1029381441351:android:5e89b83e7ad7b8a2dc2e62",
+        "android_client_info": {
+          "package_name": "com.example.task_manager"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAwHUdCdumuD_qfv7RbFnZ6HqW1BRmaS0M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
