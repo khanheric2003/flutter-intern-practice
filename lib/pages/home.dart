@@ -13,11 +13,12 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   // List of tasks
   List taskList = [
-    ["something", false],
-    ["something", true]
+    ["something", false, "description 1"],
+    ["something", true, "description 2"]
   ];
   // text controller
   final _controller = TextEditingController();
+  final _descriptionController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -30,20 +31,30 @@ class _HomeScreenState extends State<HomeScreen> {
 
     // save new task
     void saveNewTask() {
-      setState(() {
-        taskList.add([_controller.text, false]);
-        Navigator.of(context).pop();
-        _controller.clear();
-      });
+      if (_controller.text.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Task cannot be empty!')),
+        );
+      } else {
+        setState(() {
+          taskList.add([_controller.text, false, _descriptionController.text]);
+          Navigator.of(context).pop();
+          _controller.clear();
+          _descriptionController.clear();
+        });
+      }
     }
 
     // create a new task
     void createNewTask() {
+      _controller.clear();
+      _descriptionController.clear();
       showDialog(
         context: context,
         builder: (context) {
           return DialogBox(
-            controller: _controller,
+            taskController: _controller,
+            descriptionController: _descriptionController,
             onSave: saveNewTask,
             onCancel: () => Navigator.of(context).pop(),
           );
@@ -52,24 +63,32 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     // edit existing task
-    void editTask(int index, String newTaskName) {
-      setState(() {
-        taskList[index][0] = newTaskName;
-        _controller.text = newTaskName;
-        Navigator.of(context).pop();
-      });
+    void editTask(int index, String newTaskName, String newDescription) {
+      if (_controller.text.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Task cannot be empty!')),
+        );
+      } else {
+        setState(() {
+          taskList[index][0] = newTaskName;
+          taskList[index][2] = newDescription;
+          Navigator.of(context).pop();
+        });
+      }
     }
 
     // show edit dialog
     void showEditDialog(int index) {
       _controller.text = taskList[index][0];
+      _descriptionController.text = taskList[index][2];
       showDialog(
         context: context,
         builder: (context) {
           return DialogBox(
-            controller: _controller,
+            taskController: _controller,
+            descriptionController: _descriptionController,
             onSave: () {
-              editTask(index, _controller.text);
+              editTask(index, _controller.text, _descriptionController.text);
             },
             onCancel: () => Navigator.of(context).pop(),
           );
@@ -127,17 +146,21 @@ class _HomeScreenState extends State<HomeScreen> {
       // floating add button
       floatingActionButton: FloatingActionButton(
         onPressed: createNewTask,
-        child: Icon(Icons.add),
+        child: Icon(
+          Icons.add,
+          color: Colors.blue[600],
+        ),
       ),
       body: ListView.builder(
         itemCount: taskList.length,
         itemBuilder: (context, index) {
           return TaskTitle(
-              taskName: taskList[index][0],
-              taskCompleted: taskList[index][1],
-              onChanged: (value) => checkBoxChanged(value, index),
-              onDelete: (context) => deleteTask(index),
-              onEdit: (context) => showEditDialog(index));
+            taskName: taskList[index][0],
+            taskCompleted: taskList[index][1],
+            onChanged: (value) => checkBoxChanged(value, index),
+            onDelete: (context) => deleteTask(index),
+            onEdit: (context) => showEditDialog(index),
+          );
         },
       ),
     );
