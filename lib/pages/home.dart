@@ -32,6 +32,8 @@ class _HomeScreenState extends State<HomeScreen> {
     void saveNewTask() {
       setState(() {
         taskList.add([_controller.text, false]);
+        Navigator.of(context).pop();
+        _controller.clear();
       });
     }
 
@@ -43,8 +45,16 @@ class _HomeScreenState extends State<HomeScreen> {
           return DialogBox(
             controller: _controller,
             onSave: saveNewTask,
-            onCancel: () => Navigator.of(context).pop,
+            onCancel: () => Navigator.of(context).pop(),
           );
+        },
+      );
+    }
+
+    void deleteTask(int index) {
+      setState(
+        () {
+          taskList.removeAt(index);
         },
       );
     }
@@ -97,9 +107,11 @@ class _HomeScreenState extends State<HomeScreen> {
         itemCount: taskList.length,
         itemBuilder: (context, index) {
           return TaskTitle(
-              taskName: taskList[index][0],
-              taskCompleted: taskList[index][1],
-              onChanged: (value) => checkBoxChanged(value, index));
+            taskName: taskList[index][0],
+            taskCompleted: taskList[index][1],
+            onChanged: (value) => checkBoxChanged(value, index),
+            onDelete: (context) => deleteTask(index),
+          );
         },
       ),
     );
