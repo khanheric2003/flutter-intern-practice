@@ -51,6 +51,32 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     }
 
+    // edit existing task
+    void editTask(int index, String newTaskName) {
+      setState(() {
+        taskList[index][0] = newTaskName;
+        _controller.text = newTaskName;
+        Navigator.of(context).pop();
+      });
+    }
+
+    // show edit dialog
+    void showEditDialog(int index) {
+      _controller.text = taskList[index][0];
+      showDialog(
+        context: context,
+        builder: (context) {
+          return DialogBox(
+            controller: _controller,
+            onSave: () {
+              editTask(index, _controller.text);
+            },
+            onCancel: () => Navigator.of(context).pop(),
+          );
+        },
+      );
+    }
+
     void deleteTask(int index) {
       setState(
         () {
@@ -107,11 +133,11 @@ class _HomeScreenState extends State<HomeScreen> {
         itemCount: taskList.length,
         itemBuilder: (context, index) {
           return TaskTitle(
-            taskName: taskList[index][0],
-            taskCompleted: taskList[index][1],
-            onChanged: (value) => checkBoxChanged(value, index),
-            onDelete: (context) => deleteTask(index),
-          );
+              taskName: taskList[index][0],
+              taskCompleted: taskList[index][1],
+              onChanged: (value) => checkBoxChanged(value, index),
+              onDelete: (context) => deleteTask(index),
+              onEdit: (context) => showEditDialog(index));
         },
       ),
     );
