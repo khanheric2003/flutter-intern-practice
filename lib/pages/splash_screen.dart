@@ -46,7 +46,7 @@ class _SplashScreenState extends State<SplashScreen>
               begin: Alignment.topRight,
               end: Alignment.bottomCenter),
         ),
-        child: const Column(
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.calendar_month_outlined, size: 80, color: Colors.white),

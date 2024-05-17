@@ -1,7 +1,11 @@
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:task_manager/util/dialog_box.dart';
 import 'package:task_manager/util/task_tile.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+import 'package:firebase_auth/firebase_auth.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -11,99 +15,53 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // List of tasks
-  List taskList = [
-    ["something", false, "description 1"],
-    ["something", true, "description 2"]
-  ];
-  // text controller
   final _controller = TextEditingController();
   final _descriptionController = TextEditingController();
 
-  @override
-  Widget build(BuildContext context) {
-    // checkbox tapped
-    void checkBoxChanged(bool? value, int index) {
-      setState(() {
-        taskList[index][1] = value!;
-      });
-    }
+  Future<void> addTaskToFirestore(
+      String taskName, String taskDescription) async {
+    final tasksCollection = FirebaseFirestore.instance
+        .collection('userList')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection('tasks');
+    await tasksCollection.add({
+      'taskName': taskName,
+      'taskDescription': taskDescription,
+      'taskCompleted': false,
+    });
+  }
 
-    // save new task
-    void saveNewTask() {
-      if (_controller.text.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Task cannot be empty!')),
-        );
-      } else {
-        setState(() {
-          taskList.add([_controller.text, false, _descriptionController.text]);
-          Navigator.of(context).pop();
-          _controller.clear();
-          _descriptionController.clear();
-        });
-      }
-    }
-
-    // create a new task
-    void createNewTask() {
+  void saveNewTask() {
+    if (_controller.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Task cannot be empty!')),
+      );
+    } else {
+      addTaskToFirestore(_controller.text, _descriptionController.text);
+      Navigator.of(context).pop();
       _controller.clear();
       _descriptionController.clear();
-      showDialog(
-        context: context,
-        builder: (context) {
-          return DialogBox(
-            taskController: _controller,
-            descriptionController: _descriptionController,
-            onSave: saveNewTask,
-            onCancel: () => Navigator.of(context).pop(),
-          );
-        },
-      );
     }
+  }
 
-    // edit existing task
-    void editTask(int index, String newTaskName, String newDescription) {
-      if (_controller.text.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Task cannot be empty!')),
+  void createNewTask() {
+    _controller.clear();
+    _descriptionController.clear();
+    showDialog(
+      context: context,
+      builder: (context) {
+        return DialogBox(
+          taskController: _controller,
+          descriptionController: _descriptionController,
+          onSave: saveNewTask,
+          onCancel: () => Navigator.of(context).pop(),
         );
-      } else {
-        setState(() {
-          taskList[index][0] = newTaskName;
-          taskList[index][2] = newDescription;
-          Navigator.of(context).pop();
-        });
-      }
-    }
+      },
+    );
+  }
 
-    // show edit dialog
-    void showEditDialog(int index) {
-      _controller.text = taskList[index][0];
-      _descriptionController.text = taskList[index][2];
-      showDialog(
-        context: context,
-        builder: (context) {
-          return DialogBox(
-            taskController: _controller,
-            descriptionController: _descriptionController,
-            onSave: () {
-              editTask(index, _controller.text, _descriptionController.text);
-            },
-            onCancel: () => Navigator.of(context).pop(),
-          );
-        },
-      );
-    }
-
-    void deleteTask(int index) {
-      setState(
-        () {
-          taskList.removeAt(index);
-        },
-      );
-    }
-
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 233, 242, 246),
       appBar: AppBar(
@@ -151,15 +109,53 @@ class _HomeScreenState extends State<HomeScreen> {
           color: Colors.blue[600],
         ),
       ),
-      body: ListView.builder(
-        itemCount: taskList.length,
-        itemBuilder: (context, index) {
-          return TaskTitle(
-            taskName: taskList[index][0],
-            taskCompleted: taskList[index][1],
-            onChanged: (value) => checkBoxChanged(value, index),
-            onDelete: (context) => deleteTask(index),
-            onEdit: (context) => showEditDialog(index),
+      body: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('userList')
+            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .collection('tasks')
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return CircularProgressIndicator();
+          }
+          final tasks = snapshot.data!.docs;
+          return ListView.builder(
+            itemCount: tasks.length,
+            itemBuilder: (context, index) {
+              final task = tasks[index];
+              return TaskTitle(
+                taskName: task['taskName'],
+                taskCompleted: task['taskCompleted'],
+                onChanged: (value) {
+                  task.reference.update({'taskCompleted': value});
+                },
+                onDelete: (context) {
+                  task.reference.delete();
+                },
+                onEdit: (context) {
+                  _controller.text = task['taskName'];
+                  _descriptionController.text = task['taskDescription'];
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return DialogBox(
+                        taskController: _controller,
+                        descriptionController: _descriptionController,
+                        onSave: () {
+                          task.reference.update({
+                            'taskName': _controller.text,
+                            'taskDescription': _descriptionController.text,
+                          });
+                          Navigator.of(context).pop();
+                        },
+                        onCancel: () => Navigator.of(context).pop(),
+                      );
+                    },
+                  );
+                },
+              );
+            },
           );
         },
       ),

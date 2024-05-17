@@ -2,11 +2,26 @@ import 'package:firebase_auth/firebase_auth.dart' hide EmailAuthProvider;
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:firebase_ui_oauth_google/firebase_ui_oauth_google.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'home.dart';
 
 class AuthGate extends StatelessWidget {
   const AuthGate({super.key});
+  Future<void> createUserDocument(User? user) async {
+    if (user != null) {
+      final usersCollection = FirebaseFirestore.instance.collection('userList');
+      final docRef = usersCollection.doc(user.uid);
+
+      // Check if doc exists, if not create it
+      var doc = await docRef.get();
+      if (!doc.exists) {
+        await docRef.set({
+          // Your fields here
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
