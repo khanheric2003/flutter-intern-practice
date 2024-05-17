@@ -1,5 +1,4 @@
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:task_manager/util/dialog_box.dart';
 import 'package:task_manager/util/task_tile.dart';
@@ -116,47 +115,50 @@ class _HomeScreenState extends State<HomeScreen> {
             .collection('tasks')
             .snapshots(),
         builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return CircularProgressIndicator();
+          if (snapshot.hasData) {
+            final tasks = snapshot.data!.docs;
+            return ListView.builder(
+              itemCount: tasks.length,
+              itemBuilder: (context, index) {
+                final task = tasks[index];
+                return TaskTitle(
+                  taskName: task['taskName'],
+                  taskCompleted: task['taskCompleted'],
+                  onChanged: (value) {
+                    task.reference.update({'taskCompleted': value});
+                  },
+                  onDelete: (context) {
+                    task.reference.delete();
+                  },
+                  onEdit: (context) {
+                    _controller.text = task['taskName'];
+                    _descriptionController.text = task['taskDescription'];
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return DialogBox(
+                          taskController: _controller,
+                          descriptionController: _descriptionController,
+                          onSave: () {
+                            task.reference.update({
+                              'taskName': _controller.text,
+                              'taskDescription': _descriptionController.text,
+                            });
+                            Navigator.of(context).pop();
+                          },
+                          onCancel: () => Navigator.of(context).pop(),
+                        );
+                      },
+                    );
+                  },
+                );
+              },
+            );
           }
-          final tasks = snapshot.data!.docs;
-          return ListView.builder(
-            itemCount: tasks.length,
-            itemBuilder: (context, index) {
-              final task = tasks[index];
-              return TaskTitle(
-                taskName: task['taskName'],
-                taskCompleted: task['taskCompleted'],
-                onChanged: (value) {
-                  task.reference.update({'taskCompleted': value});
-                },
-                onDelete: (context) {
-                  task.reference.delete();
-                },
-                onEdit: (context) {
-                  _controller.text = task['taskName'];
-                  _descriptionController.text = task['taskDescription'];
-                  showDialog(
-                    context: context,
-                    builder: (context) {
-                      return DialogBox(
-                        taskController: _controller,
-                        descriptionController: _descriptionController,
-                        onSave: () {
-                          task.reference.update({
-                            'taskName': _controller.text,
-                            'taskDescription': _descriptionController.text,
-                          });
-                          Navigator.of(context).pop();
-                        },
-                        onCancel: () => Navigator.of(context).pop(),
-                      );
-                    },
-                  );
-                },
-              );
-            },
-          );
+          if (snapshot.hasError) {
+            return Center(child: Text(snapshot.error.toString()));
+          }
+          return const Center(child: CircularProgressIndicator());
         },
       ),
     );

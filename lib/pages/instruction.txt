@@ -1,0 +1,8 @@
+References: https://developers.google.com/android/guides/client-auth?authuser=0
+
+1. Make sure you have android cmdline-tools install on your machine
+2. Run "keytool -list -v -alias androiddebugkey -keystore C:\\Users\<Your User>\.android\debug.keystore"
+3. In your VS Code, open terminal, type "cd android"
+4. Run .\gradlew signingReport
+5. Copy the SHA1 and SHA256 fingerprint from "Variant: debug Config: debug" and "Variant: release Config: release" to Firebase
+developers.google.com
