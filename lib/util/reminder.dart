@@ -1,71 +1,94 @@
 import 'package:flutter/material.dart';
 
-Future<void> setReminder(BuildContext context) async {
+enum ReminderFrequency { daily, weekly, none }
+
+Future<List?> setReminder(BuildContext context) async {
   DateTime? pickedDate;
   TimeOfDay? pickedTime;
-  bool reminder = false;
+  ReminderFrequency reminderFrequency = ReminderFrequency.none;
 
-  return showDialog(
-    context: context,
-    builder: (context) {
-      return StatefulBuilder(
+  return Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Set a reminder'),
+      ),
+      body: StatefulBuilder(
         builder: (context, setState) {
-          return Dialog(
-            elevation: 6,
-            insetPadding:
-                const EdgeInsets.symmetric(vertical: 240, horizontal: 30),
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
             child: Column(
               children: [
-                Text('Set a reminder'),
-                CheckboxListTile(
-                  title: Text('Reminder'),
-                  value: reminder,
-                  onChanged: (bool? value) {
-                    setState(() {
-                      reminder = value!;
-                    });
-                  },
+                Expanded(
+                  child: ListView(
+                    children: [
+                      ListTile(
+                        title: const Text('Daily'),
+                        leading: Radio<ReminderFrequency>(
+                          value: ReminderFrequency.daily,
+                          groupValue: reminderFrequency,
+                          onChanged: (ReminderFrequency? value) {
+                            setState(() {
+                              reminderFrequency = value!;
+                            });
+                          },
+                        ),
+                      ),
+                      ListTile(
+                        title: const Text('Weekly'),
+                        leading: Radio<ReminderFrequency>(
+                          value: ReminderFrequency.weekly,
+                          groupValue: reminderFrequency,
+                          onChanged: (ReminderFrequency? value) {
+                            setState(() {
+                              reminderFrequency = value!;
+                            });
+                          },
+                        ),
+                      ),
+                      ElevatedButton(
+                        child: Text(pickedDate == null
+                            ? 'Pick a date'
+                            : 'Picked date: ${pickedDate!.toLocal()}'),
+                        onPressed: () async {
+                          pickedDate = await showDatePicker(
+                            context: context,
+                            initialDate: DateTime.now(),
+                            firstDate: DateTime.now(),
+                            lastDate: DateTime(DateTime.now().year + 5),
+                          );
+                          setState(() {});
+                        },
+                      ),
+                      ElevatedButton(
+                        child: Text(pickedTime == null
+                            ? 'Pick a time'
+                            : 'Picked time: ${pickedTime!.format(context)}'),
+                        onPressed: () async {
+                          pickedTime = await showTimePicker(
+                            context: context,
+                            initialTime: TimeOfDay.now(),
+                          );
+                          setState(() {});
+                        },
+                      ),
+                    ],
+                  ),
                 ),
-                if (reminder)
-                  ElevatedButton(
-                    child: Text(pickedDate == null
-                        ? 'Pick a date'
-                        : 'Picked date: ${pickedDate!.toLocal()}'),
-                    onPressed: () async {
-                      pickedDate = await showDatePicker(
-                        context: context,
-                        initialDate: DateTime.now(),
-                        firstDate: DateTime.now(),
-                        lastDate: DateTime(DateTime.now().year + 5),
-                      );
-                      setState(() {});
+                Align(
+                  alignment: Alignment.bottomRight,
+                  child: ElevatedButton(
+                    child: const Text('Save'),
+                    onPressed: () {
+                      Navigator.of(context)
+                          .pop([pickedDate, pickedTime, reminderFrequency]);
                     },
                   ),
-                if (reminder)
-                  ElevatedButton(
-                    child: Text(pickedTime == null
-                        ? 'Pick a time'
-                        : 'Picked time: ${pickedTime!.format(context)}'),
-                    onPressed: () async {
-                      pickedTime = await showTimePicker(
-                        context: context,
-                        initialTime: TimeOfDay.now(),
-                      );
-                      setState(() {});
-                    },
-                  ),
-                ElevatedButton(
-                  child: const Text('Save'),
-                  onPressed: () {
-                    Navigator.of(context)
-                        .pop([reminder, pickedDate, pickedTime]);
-                  },
                 ),
               ],
             ),
           );
         },
-      );
-    },
-  );
+      ),
+    );
+  }));
 }
