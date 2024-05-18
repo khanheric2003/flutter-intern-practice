@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:task_manager/util/dialog_box.dart';
 import 'package:task_manager/util/task_tile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
+import 'setting.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+
+import '../util/reminder.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -67,6 +69,10 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: Colors.blue[300],
         actions: [
           IconButton(
+            icon: Icon(Icons.notifications),
+            onPressed: () => setReminder(context),
+          ),
+          IconButton(
             icon: const Icon(Icons.person),
             onPressed: () {
               Navigator.push(
@@ -95,7 +101,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               );
             },
-          )
+          ),
+          // setting buttons set here,
+          IconButton(
+            icon: Icon(Icons.settings),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => SettingsScreen()),
+              );
+            },
+          ),
         ],
         automaticallyImplyLeading: false,
       ),

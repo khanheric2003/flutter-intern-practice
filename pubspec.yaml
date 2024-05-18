@@ -17,6 +17,7 @@ dependencies:
   flutter_slidable: ^1.2.0
   firebase_storage: ^11.6.9
   cloud_firestore: ^4.17.3
+  firebase_messaging: ^14.9.2
 
 dev_dependencies:
   flutter_test:

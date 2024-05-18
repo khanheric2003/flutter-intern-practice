@@ -64,6 +64,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '1029381441351',
     projectId: 'intern-flutter-ae32d',
     storageBucket: 'intern-flutter-ae32d.appspot.com',
+    androidClientId: '1029381441351-ofnd2e49olcqopdp1chl85rodiv3ntlj.apps.googleusercontent.com',
+    iosClientId: '1029381441351-cjmhqc9t5q6ng4dk1pr3u4m64jv0ljhl.apps.googleusercontent.com',
     iosBundleId: 'com.example.taskManager',
   );
 
@@ -73,6 +75,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '1029381441351',
     projectId: 'intern-flutter-ae32d',
     storageBucket: 'intern-flutter-ae32d.appspot.com',
+    androidClientId: '1029381441351-ofnd2e49olcqopdp1chl85rodiv3ntlj.apps.googleusercontent.com',
+    iosClientId: '1029381441351-cjmhqc9t5q6ng4dk1pr3u4m64jv0ljhl.apps.googleusercontent.com',
     iosBundleId: 'com.example.taskManager',
   );
 
@@ -85,4 +89,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'intern-flutter-ae32d.appspot.com',
     measurementId: 'G-9LS8MW1S23',
   );
+
 }
