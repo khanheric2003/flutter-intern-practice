@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:task_manager/util/dialog_box.dart';
 import 'package:task_manager/util/task_tile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'setting.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
+import 'package:firebase_auth/firebase_auth.dart';
+import 'setting.dart';
+import 'reminder_screen_list.dart';
+import 'edit_task_screen.dart';
 import '../util/reminder.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -29,6 +31,9 @@ class _HomeScreenState extends State<HomeScreen> {
       'taskName': taskName,
       'taskDescription': taskDescription,
       'taskCompleted': false,
+      'isReminder': false, // Default value
+      'reminderDate': null, // Default value
+      'reminderTime': '', // Default value
     });
   }
 
@@ -69,8 +74,22 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: Colors.blue[300],
         actions: [
           IconButton(
-            icon: Icon(Icons.notifications),
-            onPressed: () => setReminder(context),
+            icon: Icon(Icons.calendar_month_outlined),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ReminderScreen()),
+              );
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.alarm),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => SetReminder()),
+              );
+            },
           ),
           IconButton(
             icon: const Icon(Icons.person),
@@ -102,7 +121,6 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             },
           ),
-          // setting buttons set here,
           IconButton(
             icon: Icon(Icons.settings),
             onPressed: () {
@@ -115,8 +133,6 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
         automaticallyImplyLeading: false,
       ),
-
-      // floating add button
       floatingActionButton: FloatingActionButton(
         onPressed: createNewTask,
         child: Icon(
@@ -124,58 +140,55 @@ class _HomeScreenState extends State<HomeScreen> {
           color: Colors.blue[600],
         ),
       ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection('userList')
-            .doc(FirebaseAuth.instance.currentUser!.uid)
-            .collection('tasks')
-            .snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            final tasks = snapshot.data!.docs;
-            return ListView.builder(
-              itemCount: tasks.length,
-              itemBuilder: (context, index) {
-                final task = tasks[index];
-                return TaskTitle(
-                  taskName: task['taskName'],
-                  taskCompleted: task['taskCompleted'],
-                  onChanged: (value) {
-                    task.reference.update({'taskCompleted': value});
-                  },
-                  onDelete: (context) {
-                    task.reference.delete();
-                  },
-                  onEdit: (context) {
-                    _controller.text = task['taskName'];
-                    _descriptionController.text = task['taskDescription'];
-                    showDialog(
-                      context: context,
-                      builder: (context) {
-                        return DialogBox(
-                          taskController: _controller,
-                          descriptionController: _descriptionController,
-                          onSave: () {
-                            task.reference.update({
-                              'taskName': _controller.text,
-                              'taskDescription': _descriptionController.text,
-                            });
-                            Navigator.of(context).pop();
-                          },
-                          onCancel: () => Navigator.of(context).pop(),
-                        );
-                      },
-                    );
-                  },
-                );
+      body: Column(
+        children: [
+          Expanded(
+            child: StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('userList')
+                  .doc(FirebaseAuth.instance.currentUser!.uid)
+                  .collection('tasks')
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  final tasks = snapshot.data!.docs;
+                  return ListView.builder(
+                    itemCount: tasks.length,
+                    itemBuilder: (context, index) {
+                      final task = tasks[index];
+                      return TaskTitle(
+                        taskName: task['taskName'],
+                        taskCompleted: task['taskCompleted'],
+                        onChanged: (value) {
+                          task.reference.update({'taskCompleted': value});
+                        },
+                        onDelete: (context) {
+                          task.reference.delete();
+                        },
+                        onEdit: (context) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => EditTaskScreen(
+                                taskId: task.id, // Pass the task ID here
+                                taskName: task['taskName'],
+                                taskDescription: task['taskDescription'],
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  );
+                }
+                if (snapshot.hasError) {
+                  return Center(child: Text(snapshot.error.toString()));
+                }
+                return const Center(child: CircularProgressIndicator());
               },
-            );
-          }
-          if (snapshot.hasError) {
-            return Center(child: Text(snapshot.error.toString()));
-          }
-          return const Center(child: CircularProgressIndicator());
-        },
+            ),
+          ),
+        ],
       ),
     );
   }
