@@ -31,7 +31,7 @@ class TaskTitle extends StatelessWidget {
               SlidableAction(
                 onPressed: onDelete,
                 icon: Icons.delete,
-                backgroundColor: Color.fromARGB(255, 231, 74, 74),
+                backgroundColor: const Color.fromARGB(255, 231, 74, 74),
                 borderRadius: BorderRadius.circular(12),
               )
             ],

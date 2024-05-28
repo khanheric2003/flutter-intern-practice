@@ -40,7 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void saveNewTask() {
     if (_controller.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Task cannot be empty!')),
+        const SnackBar(content: Text('Task cannot be empty!')),
       );
     } else {
       addTaskToFirestore(_controller.text, _descriptionController.text);
@@ -74,20 +74,20 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: Colors.blue[300],
         actions: [
           IconButton(
-            icon: Icon(Icons.calendar_month_outlined),
+            icon: const Icon(Icons.calendar_month_outlined),
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => ReminderScreen()),
+                MaterialPageRoute(builder: (context) => const ReminderScreen()),
               );
             },
           ),
           IconButton(
-            icon: Icon(Icons.alarm),
+            icon: const Icon(Icons.alarm),
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => SetReminder()),
+                MaterialPageRoute(builder: (context) => const SetReminder()),
               );
             },
           ),
@@ -122,11 +122,11 @@ class _HomeScreenState extends State<HomeScreen> {
             },
           ),
           IconButton(
-            icon: Icon(Icons.settings),
+            icon: const Icon(Icons.settings),
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => SettingsScreen()),
+                MaterialPageRoute(builder: (context) => const SettingsScreen()),
               );
             },
           ),

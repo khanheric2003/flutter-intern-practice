@@ -25,21 +25,21 @@ class DialogBox extends StatelessWidget {
           crossAxisAlignment:
               CrossAxisAlignment.start, // Align labels to the left
           children: [
-            Text('Task'), // Label for the task field
+            const Text('Task'), // Label for the task field
             Padding(
               padding: const EdgeInsets.only(
                   bottom: 10), // Add space below the task field
               child: TextField(
                 controller: taskController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                     border: OutlineInputBorder(), hintText: "Add new task"),
               ),
             ),
-            Text('Description'), // Label for the description field
+            const Text('Description'), // Label for the description field
             Expanded(
               child: TextField(
                 controller: descriptionController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                   hintText: "Add description",
                   alignLabelWithHint:

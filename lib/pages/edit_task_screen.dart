@@ -8,8 +8,8 @@ class EditTaskScreen extends StatefulWidget {
   final String taskName;
   final String taskDescription;
 
-  EditTaskScreen(
-      {required this.taskId,
+  const EditTaskScreen(
+      {super.key, required this.taskId,
       required this.taskName,
       required this.taskDescription});
 
@@ -55,7 +55,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Edit Task'),
+        title: const Text('Edit Task'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -63,18 +63,18 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
           children: <Widget>[
             TextField(
               controller: _controller,
-              decoration: InputDecoration(labelText: 'Task Name'),
+              decoration: const InputDecoration(labelText: 'Task Name'),
             ),
             TextField(
               controller: _descriptionController,
               maxLines: null, // Makes it multiline
               keyboardType: TextInputType.multiline,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Task Description',
               ),
             ),
             CheckboxListTile(
-              title: Text('Reminder'),
+              title: const Text('Reminder'),
               value: _reminder,
               onChanged: (bool? value) {
                 setState(() {
@@ -99,7 +99,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                         });
                       });
                     },
-                    child: Text('Select Date'),
+                    child: const Text('Select Date'),
                   ),
                   Text(
                     'Selected Date: ${_selectedDate.toLocal().toString().split(' ')[0]}',
@@ -121,7 +121,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                         });
                       });
                     },
-                    child: Text('Select Time'),
+                    child: const Text('Select Time'),
                   ),
                   Text(
                     'Selected Time: ${_selectedTime.format(context)}',
@@ -135,7 +135,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
         onPressed: () async {
           if (_controller.text.isEmpty || _descriptionController.text.isEmpty) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
+              const SnackBar(
                   content: Text('Task name and description cannot be empty!')),
             );
           } else {
@@ -155,8 +155,8 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
             Navigator.of(context).pop();
           }
         },
-        child: Icon(Icons.save),
         backgroundColor: Colors.blue[600],
+        child: const Icon(Icons.save),
       ),
     );
   }
