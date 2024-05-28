@@ -1,9 +1,3 @@
-// Copyright 2022, the Chromium project authors.  Please see the AUTHORS file
-// for details. All rights reserved. Use of this source code is governed by a
-// BSD-style license that can be found in the LICENSE file.
-
-// Based on https://github.com/firebase/FirebaseUI-Flutter/blob/main/packages/firebase_ui_auth/test/flows/email_auth_flow_test.dart
-
 import 'package:firebase_auth/firebase_auth.dart' hide EmailAuthProvider;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
